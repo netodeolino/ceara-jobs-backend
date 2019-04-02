@@ -74,7 +74,9 @@ class UserController {
       }
   
       if (file && userSave) {
-        await User.setImagePath(userSave.id, file)
+        console.log('if')
+        // await User.setImagePath(userSave.id, file)
+        await User.setImagePathS3(userSave.id, file)
       }
       
       trx.commit()
