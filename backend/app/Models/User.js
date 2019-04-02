@@ -4,16 +4,11 @@ const Model = use('Model')
 const Helpers = use('Helpers')
 const Database = use('Database')
 const Hash = use('Hash')
+const Drive = use('Drive')
 
 const fs = require('fs')
-const AWS = require('aws-sdk')
-
-AWS.config.update({ accessKeyId: process.env.S3_KEY, secretAccessKey: process.env.S3_SECRET })
-
-const s3 = new AWS.S3()
 
 class User extends Model {
-
   static boot () {
     super.boot()
     
@@ -74,35 +69,19 @@ class User extends Model {
   static async setImagePathS3(userId, file) {
     try {
       let user = await this.find(userId)
-      // let resp = await Drive.disk('s3').put(`user-${user.id}.${file.subtype}`, JSON.stringify(file.stream))
-      // console.log('resp', resp)
 
-      // FUNCIONANDO
-      // s3.upload(
-      //   { Bucket: process.env.S3_BUCKET, Body: fs.createReadStream(file.tmpPath), Key: `user-${user.id}.${file.subtype}`},
-      //   function (err, data) {
-      //     if (err) {
-      //       console.log("error", err);
-      //     }
-      //     if (data) {
-      //       console.log("Uploaded in:", data.Location);
-      //     }
-      //   }
-      // )
-
-      // await file.move(Helpers.publicPath('uploads'), {
-      //   name: `user-${user.id}.${file.subtype}`
-      // })
+      let resp = null
+      if (user) {
+        resp = await Drive.disk('s3').put(`user/${user.id}.${file.subtype}`, fs.createReadStream(file.tmpPath))
+      }
   
-      // if (!file.moved()) {
-      //   return false
-      // }
-  
-      // user.path_image = `user-${user.id}.${file.subtype}`
-      // return await user.save()
-      return true
+      if (!resp) {
+        return false
+      }
+      
+      user.path_image = resp
+      return await user.save()
     } catch (error) {
-      console.log('error', error)
       return false
     }
   }
@@ -146,7 +125,6 @@ class User extends Model {
   address () {
     return this.hasOne('App/Models/Address')
   }
-
 }
 
 module.exports = User

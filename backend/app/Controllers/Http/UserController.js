@@ -74,8 +74,6 @@ class UserController {
       }
   
       if (file && userSave) {
-        console.log('if')
-        // await User.setImagePath(userSave.id, file)
         await User.setImagePathS3(userSave.id, file)
       }
       
