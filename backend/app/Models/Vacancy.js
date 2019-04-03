@@ -3,6 +3,9 @@
 const Model = use('Model')
 const Helpers = use('Helpers')
 const Database = use('Database')
+const Drive = use('Drive')
+
+const fs = require('fs')
 const DAYS_TO_EXPIRATION = 7
 
 class Vacancy extends Model {
@@ -42,6 +45,21 @@ class Vacancy extends Model {
       }
   
       vacancy.path_image = `vacancy-${vacancy.id}.${file.subtype}`
+      return await vacancy.save()
+    } catch (error) {
+      return error
+    }
+  }
+
+  static async setImagePathS3(vacancy, file) {
+    try {
+      let resp = await Drive.disk('s3').put(`vacancy/${vacancy.id}.${file.subtype}`, fs.createReadStream(file.tmpPath))
+  
+      if (!resp) {
+        return false
+      }
+  
+      vacancy.path_image = resp
       return await vacancy.save()
     } catch (error) {
       return error

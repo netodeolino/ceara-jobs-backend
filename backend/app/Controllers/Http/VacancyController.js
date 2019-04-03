@@ -30,7 +30,7 @@ class VacancyController {
       }
       
       if (file && vacancySave) {
-        await Vacancy.setImagePath(vacancySave, file)
+        await Vacancy.setImagePathS3(vacancySave, file)
       }
   
       if (user && vacancySave) {
