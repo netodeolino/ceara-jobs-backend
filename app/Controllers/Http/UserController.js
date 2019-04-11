@@ -13,7 +13,7 @@ class UserController {
 
     const { email, password } = request.all()
     try {
-      const user = await User.findBy({ email })
+      let user = await User.findBy({ email })
       let token = null
 
       if (user) {
@@ -26,12 +26,11 @@ class UserController {
       }
 
       if (token) {
+        user.token = token.token;
         return response.status(200).json({
           status: 'Sucesso',
           message: 'Login realizado com sucesso.',
-          token: token.token,
-          path_image: user.path_image,
-          user_id: user.id
+          user,
         })
       } else {
         throw 'Token inválido.'
