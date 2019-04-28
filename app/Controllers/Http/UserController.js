@@ -27,6 +27,9 @@ class UserController {
 
       if (token) {
         user.token = token.token;
+        user.address = await Address.find(user.address_id);
+        user.total_vacancies = await User.numberOfVacancies(user.id);
+
         return response.status(200).json({
           status: 'Sucesso',
           message: 'Login realizado com sucesso.',
